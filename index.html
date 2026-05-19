@@ -9,7 +9,7 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #f5f3ee;
+    --bg: #ffffff;
     --surface: #ffffff;
     --border: #ddd9d0;
     --border-strong: #b8b3a8;
@@ -361,10 +361,10 @@
 
   <header>
     <h1>Review inschrijving</h1>
-    <p>Schrijf je in op het eerstvolgende beschikbare tijdslot · 20 min per student · blok 1: 10:00–12:00 · blok 2: 13:00–15:00</p>
+    <p>Schrijf je in op het eerstvolgende beschikbare tijdslot · 20 min per student · 10:00–13:00 · </p>
   </header>
 
-  <!-- STUDENTENLIJST -->
+  STUDENTENLIJST
   <div class="edit-panel open" id="editPanel" style="margin-bottom:2rem;">
     <label>Studentenlijst (één naam per regel)</label>
     <textarea id="studentListInput"></textarea>
@@ -395,8 +395,8 @@
   <div id="slotsA" style="margin-bottom:1.5rem;"></div>
 
   <!-- BLOK 2 -->
-  <div class="slots-label">Blok 2 — 13:00 tot 15:00</div>
-  <div id="slotsB"></div>
+  <!-- <div class="slots-label">Blok 2 — 13:00 tot 15:00</div> -->
+  <!-- <div id="slotsB"></div> -->
 
   <button class="reset-btn" onclick="resetAll()">↺ Alles wissen</button>
 
@@ -408,16 +408,16 @@
 </div>
 
 <script>
-// ── Twee vaste blokken: 10:00-12:00 en 13:00-15:00, 20 min per slot
+// ── Een blok: 10:00-13:00, 20 min per slot
 const BLOCKS = [
-  { start: 10*60, end: 12*60 },
+  { start: 10*60, end: 13*60 },
   { start: 13*60, end: 15*60 }
 ];
 const DURATION = 20;
 
 // Slotsstructuur: twee arrays, één per blok
 let slotsA = [];
-let slotsB = [];
+// let slotsB = [];
 let students = [];
 
 // ── STUDENTENLIJST — vervang deze namen door jouw klaslijst
