@@ -361,7 +361,7 @@
 
   <header>
     <h1>Review inschrijving</h1>
-    <p>Schrijf je in (waar staat "--Kies je naam--") op het eerstvolgende beschikbare tijdslot · 20 min per student · 10:00–13:00 · </p>
+    <p>Schrijf je in (waar staat "--Kies je naam--") op het eerstvolgende beschikbare tijdslot · 30 min per student · 10:00–13:00 · </p>
   </header>
 
   <!-- STATS -->
@@ -393,19 +393,19 @@
   <button class="reset-btn" onclick="resetAll()">↺ Alles wissen</button>
 
   <footer>
-    <span>20 min per student · aaneengesloten slots per blok</span>
+    <span>30 min per student · aaneengesloten slots per blok</span>
     <span id="footerDate"></span>
   </footer>
 
 </div>
 
 <script>
-// ── Een blok: 10:00-13:00, 20 min per slot
+// ── Een blok: 10:00-13:00, 30 min per slot
 const BLOCKS = [
   { start: 10*60, end: 13*60 },
   { start: 13*60, end: 15*60 }
 ];
-const DURATION = 20;
+const DURATION = 30;
 
 // Slotsstructuur: twee arrays, één per blok
 let slotsA = [];
@@ -419,8 +419,6 @@ const DEFAULT_STUDENTS = [
   "Dalvin Heyninck",
   "Margo Maes",
   "Emrys Melissant",
-  "Jimmy Nduwumwami",
-  "Bart Pijkels",
   "Freek Van Litsenborg",
   "Nie Verbeek",
   "Arne Verhulst"
