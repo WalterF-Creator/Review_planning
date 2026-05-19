@@ -361,16 +361,8 @@
 
   <header>
     <h1>Review inschrijving</h1>
-    <p>Schrijf je in op het eerstvolgende beschikbare tijdslot · 20 min per student · 10:00–13:00 · </p>
+    <p>Schrijf je in (waar staat "--Kies je naam--") op het eerstvolgende beschikbare tijdslot · 20 min per student · 10:00–13:00 · </p>
   </header>
-
-  STUDENTENLIJST
-  <div class="edit-panel open" id="editPanel" style="margin-bottom:2rem;">
-    <label>Studentenlijst (één naam per regel)</label>
-    <textarea id="studentListInput"></textarea>
-    <p class="hint">Pas de namen aan en klik op "Toepassen" om de lijst bij te werken.</p>
-    <button class="apply-btn" onclick="applyStudentList()">Toepassen</button>
-  </div>
 
   <!-- STATS -->
   <div class="stats-row">
@@ -449,19 +441,11 @@ function makeSlots(block) {
 
 function init() {
   students = [...DEFAULT_STUDENTS];
-  document.getElementById('studentListInput').value = students.join('\n');
   document.getElementById('footerDate').textContent = new Date().toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
   slotsA = makeSlots(BLOCKS[0]);
   slotsB = makeSlots(BLOCKS[1]);
   render();
   renderSelect();
-}
-
-function applyStudentList() {
-  const raw = document.getElementById('studentListInput').value;
-  students = raw.split('\n').map(s => s.trim()).filter(Boolean);
-  renderSelect();
-  hideWarning();
 }
 
 function allSlots() { return [...slotsA, ...slotsB]; }
@@ -551,7 +535,7 @@ function renderBlock(slots, containerId, blockKey) {
 
 function render() {
   renderBlock(slotsA, 'slotsA', 'A');
-  renderBlock(slotsB, 'slotsB', 'B');
+  // renderBlock(slotsB, 'slotsB', 'B');
 
   const all = allSlots();
   const filled = all.filter(s => s.name).length;
