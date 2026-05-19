@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review inschrijving</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --border: #ddd9d0;
+    --border-strong: #b8b3a8;
+    --text: #1a1916;
+    --text-muted: #7a756c;
+    --accent: #2d5a3d;
+    --accent-light: #e8f0eb;
+    --accent-text: #1a3d27;
+    --danger: #8b3a2a;
+    --danger-light: #f5ebe8;
+    --warn-bg: #fdf3e3;
+    --warn-border: #e8c97a;
+    --warn-text: #7a5a1a;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 2.5rem;
+    border-bottom: 1.5px solid var(--border);
+    padding-bottom: 1.5rem;
+  }
+
+  header h1 {
+    font-family: var(--mono);
+    font-size: 1.4rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.3rem;
+  }
+
+  header p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .config-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .config-bar .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .config-bar label {
+    font-size: 0.75rem;
+    font-family: var(--mono);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .config-bar input[type="time"],
+  .config-bar input[type="number"] {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    width: 100px;
+    outline: none;
+  }
+
+  .config-bar input:focus {
+    border-color: var(--accent);
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  .stat .val {
+    font-family: var(--mono);
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat .lbl {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .register-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .register-box .row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .register-box select {
+    flex: 1;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a756c' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  .register-box select:focus { border-color: var(--accent); }
+
+  .register-box button {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    padding: 8px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+
+  .register-box button:hover { background: var(--accent-text); }
+
+  .warning {
+    display: none;
+    margin-top: 10px;
+    font-size: 0.82rem;
+    padding: 8px 12px;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: 6px;
+    color: var(--warn-text);
+    font-family: var(--mono);
+  }
+
+  .slots-label {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+
+  .slot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    background: var(--surface);
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .slot.filled {
+    background: var(--accent-light);
+    border-color: #a8c9b2;
+  }
+
+  .slot.locked {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .slot-time {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    min-width: 96px;
+  }
+
+  .slot.filled .slot-time { color: var(--accent-text); }
+
+  .slot-name {
+    flex: 1;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+  }
+
+  .slot.filled .slot-name {
+    color: var(--accent-text);
+    font-weight: 500;
+  }
+
+  .btn-cancel {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-family: var(--mono);
+    color: var(--danger);
+    padding: 3px 8px;
+    border-radius: 4px;
+    transition: background 0.1s;
+  }
+
+  .btn-cancel:hover { background: var(--danger-light); }
+
+  .reset-btn {
+    margin-top: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .reset-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+  /* ── EDIT-STUDENTS PANEL ── */
+  .edit-toggle {
+    margin-bottom: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: none;
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .edit-toggle:hover { border-color: var(--border-strong); color: var(--text); }
+
+  .edit-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .edit-panel.open { display: block; }
+
+  .edit-panel label {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .edit-panel textarea {
+    width: 100%;
+    height: 160px;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    resize: vertical;
+    outline: none;
+    line-height: 1.6;
+  }
+
+  .edit-panel textarea:focus { border-color: var(--accent); }
+
+  .edit-panel .hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+    margin-bottom: 10px;
+  }
+
+  .edit-panel .apply-btn {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    padding: 7px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .edit-panel .apply-btn:hover { background: var(--accent-text); }
+
+  footer {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Review inschrijving</h1>
+    <p>Schrijf je in op het eerstvolgende beschikbare tijdslot · 20 min per student</p>
+  </header>
+
+  <!-- CONFIG -->
+  <div class="config-bar">
+    <div class="field">
+      <label>Starttijd</label>
+      <input type="time" id="startTime" value="09:00" oninput="rebuild()">
+    </div>
+    <div class="field">
+      <label>Aantal slots</label>
+      <input type="number" id="numSlots" value="10" min="1" max="40" oninput="rebuild()">
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat"><div class="val" id="statFilled">0</div><div class="lbl">Ingeschreven</div></div>
+    <div class="stat"><div class="val" id="statOpen">10</div><div class="lbl">Vrij</div></div>
+    <div class="stat"><div class="val" id="statNext">09:00</div><div class="lbl">Volgende vrij</div></div>
+  </div>
+
+  <!-- STUDENT LIST EDIT -->
+  <button class="edit-toggle" onclick="toggleEdit()">⚙ Studentenlijst bewerken</button>
+  <div class="edit-panel" id="editPanel">
+    <label>Studenten (één per regel)</label>
+    <textarea id="studentListInput" placeholder="Anna de Vries&#10;Bram Janssen&#10;Charlotte Smit&#10;..."></textarea>
+    <p class="hint">Plak hier de namen uit je klassenlijst. Klik op "Toepassen" om de lijst bij te werken.</p>
+    <button class="apply-btn" onclick="applyStudentList()">Toepassen</button>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="register-box">
+    <div class="row">
+      <select id="nameSelect">
+        <option value="">— Kies je naam —</option>
+      </select>
+      <button onclick="register()">Inschrijven →</button>
+    </div>
+    <div class="warning" id="warning" role="alert"></div>
+  </div>
+
+  <!-- SLOTS -->
+  <div class="slots-label">Planning</div>
+  <div id="slots"></div>
+
+  <button class="reset-btn" onclick="resetAll()">↺ Alles wissen</button>
+
+  <footer>
+    <span>20 min per student · aaneengesloten slots</span>
+    <span id="footerDate"></span>
+  </footer>
+
+</div>
+
+<script>
+const DURATION = 20;
+let slots = [];
+let students = [];
+
+// ── DEFAULT STUDENT LIST ── pas deze lijst aan voor jouw klas
+const DEFAULT_STUDENTS = [
+  "Anna de Vries",
+  "Bram Janssen",
+  "Charlotte Smit",
+  "David Bakker",
+  "Eva Linders",
+  "Finn Visser",
+  "Greta Mulder",
+  "Hassan Al-Farsi",
+  "Iris Kok",
+  "Jonas Willems"
+];
+
+function init() {
+  students = [...DEFAULT_STUDENTS];
+  document.getElementById('studentListInput').value = students.join('\n');
+  document.getElementById('footerDate').textContent = new Date().toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  rebuild();
+  renderSelect();
+}
+
+function applyStudentList() {
+  const raw = document.getElementById('studentListInput').value;
+  students = raw.split('\n').map(s=>s.trim()).filter(Boolean);
+  renderSelect();
+  hideWarning();
+}
+
+function toggleEdit() {
+  const p = document.getElementById('editPanel');
+  p.classList.toggle('open');
+}
+
+function renderSelect() {
+  const sel = document.getElementById('nameSelect');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Kies je naam —</option>';
+  const taken = new Set(slots.map(s=>s.name).filter(Boolean));
+  students.forEach(name => {
+    if(!taken.has(name)) {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      sel.appendChild(opt);
+    }
+  });
+  if(current && !taken.has(current)) sel.value = current;
+}
+
+function parseTime(str) {
+  const [h,m] = str.split(':').map(Number);
+  return h*60+m;
+}
+
+function formatTime(mins) {
+  return `${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`;
+}
+
+function rebuild() {
+  const start = parseTime(document.getElementById('startTime').value || '09:00');
+  const n = Math.max(1, Math.min(40, parseInt(document.getElementById('numSlots').value)||10));
+  const prev = slots.map(s=>s.name);
+  slots = Array.from({length:n}, (_,i) => ({
+    start: start+i*DURATION, end: start+(i+1)*DURATION,
+    name: prev[i]||null
+  }));
+  render();
+}
+
+function firstFree() {
+  return slots.findIndex(s=>!s.name);
+}
+
+function register() {
+  const sel = document.getElementById('nameSelect');
+  const name = sel.value.trim();
+  if(!name){ showWarning('Kies eerst je naam uit de lijst.'); return; }
+  const idx = firstFree();
+  if(idx===-1){ showWarning('Alle slots zijn bezet.'); return; }
+  slots[idx].name = name;
+  sel.value = '';
+  hideWarning();
+  render();
+  renderSelect();
+}
+
+function cancel(i) {
+  if(!confirm(`"${slots[i].name}" verwijderen uit de planning?`)) return;
+  slots[i].name = null;
+  for(let j=i+1;j<slots.length;j++){
+    if(slots[j].name){ slots[j-1].name=slots[j].name; slots[j].name=null; }
+    else break;
+  }
+  render();
+  renderSelect();
+}
+
+function resetAll() {
+  if(slots.some(s=>s.name) && !confirm('Alle inschrijvingen wissen?')) return;
+  slots.forEach(s=>s.name=null);
+  render();
+  renderSelect();
+}
+
+function showWarning(msg) {
+  const w = document.getElementById('warning');
+  w.textContent = '⚠ '+msg;
+  w.style.display = 'block';
+}
+function hideWarning(){ document.getElementById('warning').style.display='none'; }
+
+function render() {
+  const container = document.getElementById('slots');
+  container.innerHTML = '';
+  let filled=0, firstFreeIdx=-1;
+
+  slots.forEach((s,i)=>{
+    if(s.name) filled++;
+    else if(firstFreeIdx===-1) firstFreeIdx=i;
+
+    const prevFilled = i===0 || !!slots[i-1].name;
+    const locked = !s.name && !prevFilled;
+
+    const div = document.createElement('div');
+    div.className = 'slot'+(s.name?' filled':'')+(locked?' locked':'');
+    div.innerHTML = `
+      <span class="slot-time">${formatTime(s.start)} – ${formatTime(s.end)}</span>
+      <span class="slot-name">${s.name || (locked ? '⊘ geblokkeerd' : '+ beschikbaar')}</span>
+      ${s.name ? `<button class="btn-cancel" onclick="cancel(${i})">verwijder</button>` : ''}
+    `;
+    container.appendChild(div);
+  });
+
+  document.getElementById('statFilled').textContent = filled;
+  document.getElementById('statOpen').textContent = slots.length-filled;
+  document.getElementById('statNext').textContent = firstFreeIdx>=0 ? formatTime(slots[firstFreeIdx].start) : '–';
+}
+
+init();
+</script>
+</body>
+</html>
