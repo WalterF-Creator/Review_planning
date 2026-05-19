@@ -361,35 +361,22 @@
 
   <header>
     <h1>Review inschrijving</h1>
-    <p>Schrijf je in op het eerstvolgende beschikbare tijdslot · 20 min per student</p>
+    <p>Schrijf je in op het eerstvolgende beschikbare tijdslot · 20 min per student · blok 1: 10:00–12:00 · blok 2: 13:00–15:00</p>
   </header>
 
-  <!-- CONFIG -->
-  <div class="config-bar">
-    <div class="field">
-      <label>Starttijd</label>
-      <input type="time" id="startTime" value="09:00" oninput="rebuild()">
-    </div>
-    <div class="field">
-      <label>Aantal slots</label>
-      <input type="number" id="numSlots" value="10" min="1" max="40" oninput="rebuild()">
-    </div>
+  <!-- STUDENTENLIJST -->
+  <div class="edit-panel open" id="editPanel" style="margin-bottom:2rem;">
+    <label>Studentenlijst (één naam per regel)</label>
+    <textarea id="studentListInput"></textarea>
+    <p class="hint">Pas de namen aan en klik op "Toepassen" om de lijst bij te werken.</p>
+    <button class="apply-btn" onclick="applyStudentList()">Toepassen</button>
   </div>
 
   <!-- STATS -->
   <div class="stats-row">
     <div class="stat"><div class="val" id="statFilled">0</div><div class="lbl">Ingeschreven</div></div>
     <div class="stat"><div class="val" id="statOpen">10</div><div class="lbl">Vrij</div></div>
-    <div class="stat"><div class="val" id="statNext">09:00</div><div class="lbl">Volgende vrij</div></div>
-  </div>
-
-  <!-- STUDENT LIST EDIT -->
-  <button class="edit-toggle" onclick="toggleEdit()">⚙ Studentenlijst bewerken</button>
-  <div class="edit-panel" id="editPanel">
-    <label>Studenten (één per regel)</label>
-    <textarea id="studentListInput" placeholder="Anna de Vries&#10;Bram Janssen&#10;Charlotte Smit&#10;..."></textarea>
-    <p class="hint">Plak hier de namen uit je klassenlijst. Klik op "Toepassen" om de lijst bij te werken.</p>
-    <button class="apply-btn" onclick="applyStudentList()">Toepassen</button>
+    <div class="stat"><div class="val" id="statNext">–</div><div class="lbl">Volgende vrij</div></div>
   </div>
 
   <!-- REGISTER -->
@@ -403,161 +390,181 @@
     <div class="warning" id="warning" role="alert"></div>
   </div>
 
-  <!-- SLOTS -->
-  <div class="slots-label">Planning</div>
-  <div id="slots"></div>
+  <!-- BLOK 1 -->
+  <div class="slots-label">Blok 1 — 10:00 tot 12:00</div>
+  <div id="slotsA" style="margin-bottom:1.5rem;"></div>
+
+  <!-- BLOK 2 -->
+  <div class="slots-label">Blok 2 — 13:00 tot 15:00</div>
+  <div id="slotsB"></div>
 
   <button class="reset-btn" onclick="resetAll()">↺ Alles wissen</button>
 
   <footer>
-    <span>20 min per student · aaneengesloten slots</span>
+    <span>20 min per student · aaneengesloten slots per blok</span>
     <span id="footerDate"></span>
   </footer>
 
 </div>
 
 <script>
+// ── Twee vaste blokken: 10:00-12:00 en 13:00-15:00, 20 min per slot
+const BLOCKS = [
+  { start: 10*60, end: 12*60 },
+  { start: 13*60, end: 15*60 }
+];
 const DURATION = 20;
-let slots = [];
+
+// Slotsstructuur: twee arrays, één per blok
+let slotsA = [];
+let slotsB = [];
 let students = [];
 
-// ── DEFAULT STUDENT LIST ── pas deze lijst aan voor jouw klas
+// ── STUDENTENLIJST — vervang deze namen door jouw klaslijst
 const DEFAULT_STUDENTS = [
-  "Anna de Vries",
-  "Bram Janssen",
-  "Charlotte Smit",
-  "David Bakker",
-  "Eva Linders",
-  "Finn Visser",
-  "Greta Mulder",
-  "Hassan Al-Farsi",
-  "Iris Kok",
-  "Jonas Willems"
+  "Simon Berghmans",
+  "Anse De Bal",
+  "Dalvin Heyninck",
+  "Margo Maes",
+  "Emrys Melissant",
+  "Jimmy Nduwumwami",
+  "Bart Pijkels",
+  "Freek Van Litsenborg",
+  "Nie Verbeek",
+  "Arne Verhulst"
 ];
-
-function init() {
-  students = [...DEFAULT_STUDENTS];
-  document.getElementById('studentListInput').value = students.join('\n');
-  document.getElementById('footerDate').textContent = new Date().toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-  rebuild();
-  renderSelect();
-}
-
-function applyStudentList() {
-  const raw = document.getElementById('studentListInput').value;
-  students = raw.split('\n').map(s=>s.trim()).filter(Boolean);
-  renderSelect();
-  hideWarning();
-}
-
-function toggleEdit() {
-  const p = document.getElementById('editPanel');
-  p.classList.toggle('open');
-}
-
-function renderSelect() {
-  const sel = document.getElementById('nameSelect');
-  const current = sel.value;
-  sel.innerHTML = '<option value="">— Kies je naam —</option>';
-  const taken = new Set(slots.map(s=>s.name).filter(Boolean));
-  students.forEach(name => {
-    if(!taken.has(name)) {
-      const opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
-      sel.appendChild(opt);
-    }
-  });
-  if(current && !taken.has(current)) sel.value = current;
-}
-
-function parseTime(str) {
-  const [h,m] = str.split(':').map(Number);
-  return h*60+m;
-}
 
 function formatTime(mins) {
   return `${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`;
 }
 
-function rebuild() {
-  const start = parseTime(document.getElementById('startTime').value || '09:00');
-  const n = Math.max(1, Math.min(40, parseInt(document.getElementById('numSlots').value)||10));
-  const prev = slots.map(s=>s.name);
-  slots = Array.from({length:n}, (_,i) => ({
-    start: start+i*DURATION, end: start+(i+1)*DURATION,
-    name: prev[i]||null
+function makeSlots(block) {
+  const n = Math.floor((block.end - block.start) / DURATION);
+  return Array.from({length: n}, (_, i) => ({
+    start: block.start + i * DURATION,
+    end:   block.start + (i+1) * DURATION,
+    name: null
   }));
-  render();
 }
 
-function firstFree() {
-  return slots.findIndex(s=>!s.name);
+function init() {
+  students = [...DEFAULT_STUDENTS];
+  document.getElementById('studentListInput').value = students.join('\n');
+  document.getElementById('footerDate').textContent = new Date().toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  slotsA = makeSlots(BLOCKS[0]);
+  slotsB = makeSlots(BLOCKS[1]);
+  render();
+  renderSelect();
 }
+
+function applyStudentList() {
+  const raw = document.getElementById('studentListInput').value;
+  students = raw.split('\n').map(s => s.trim()).filter(Boolean);
+  renderSelect();
+  hideWarning();
+}
+
+function allSlots() { return [...slotsA, ...slotsB]; }
+
+function renderSelect() {
+  const sel = document.getElementById('nameSelect');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Kies je naam —</option>';
+  const taken = new Set(allSlots().map(s => s.name).filter(Boolean));
+  students.forEach(name => {
+    if (!taken.has(name)) {
+      const opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      sel.appendChild(opt);
+    }
+  });
+  if (cur && !taken.has(cur)) sel.value = cur;
+}
+
+function firstFreeIn(slots) { return slots.findIndex(s => !s.name); }
 
 function register() {
   const sel = document.getElementById('nameSelect');
   const name = sel.value.trim();
-  if(!name){ showWarning('Kies eerst je naam uit de lijst.'); return; }
-  const idx = firstFree();
-  if(idx===-1){ showWarning('Alle slots zijn bezet.'); return; }
-  slots[idx].name = name;
+  if (!name) { showWarning('Kies eerst je naam uit de lijst.'); return; }
+
+  // Zoek eerste vrije slot: eerst blok A, dan blok B — maar alleen als vorige blok vol is of dit het eerste vrije is
+  let target = null;
+  const idxA = firstFreeIn(slotsA);
+  const idxB = firstFreeIn(slotsB);
+
+  if (idxA !== -1) {
+    // Alleen inschrijven als voorgaand slot bezet is (aaneengesloten)
+    if (idxA === 0 || slotsA[idxA - 1].name) target = { arr: slotsA, idx: idxA };
+  }
+  if (!target && idxB !== -1) {
+    if (idxB === 0 || slotsB[idxB - 1].name) target = { arr: slotsB, idx: idxB };
+  }
+  if (!target) { showWarning('Alle slots zijn bezet.'); return; }
+
+  target.arr[target.idx].name = name;
   sel.value = '';
   hideWarning();
   render();
   renderSelect();
 }
 
-function cancel(i) {
-  if(!confirm(`"${slots[i].name}" verwijderen uit de planning?`)) return;
-  slots[i].name = null;
-  for(let j=i+1;j<slots.length;j++){
-    if(slots[j].name){ slots[j-1].name=slots[j].name; slots[j].name=null; }
+function cancel(block, i) {
+  const arr = block === 'A' ? slotsA : slotsB;
+  if (!confirm(`"${arr[i].name}" verwijderen uit de planning?`)) return;
+  arr[i].name = null;
+  for (let j = i+1; j < arr.length; j++) {
+    if (arr[j].name) { arr[j-1].name = arr[j].name; arr[j].name = null; }
     else break;
   }
-  render();
-  renderSelect();
+  render(); renderSelect();
 }
 
 function resetAll() {
-  if(slots.some(s=>s.name) && !confirm('Alle inschrijvingen wissen?')) return;
-  slots.forEach(s=>s.name=null);
-  render();
-  renderSelect();
+  if (allSlots().some(s => s.name) && !confirm('Alle inschrijvingen wissen?')) return;
+  [...slotsA, ...slotsB].forEach(s => s.name = null);
+  render(); renderSelect();
 }
 
 function showWarning(msg) {
   const w = document.getElementById('warning');
-  w.textContent = '⚠ '+msg;
-  w.style.display = 'block';
+  w.textContent = '⚠ ' + msg; w.style.display = 'block';
 }
-function hideWarning(){ document.getElementById('warning').style.display='none'; }
+function hideWarning() { document.getElementById('warning').style.display = 'none'; }
 
-function render() {
-  const container = document.getElementById('slots');
+function renderBlock(slots, containerId, blockKey) {
+  const container = document.getElementById(containerId);
   container.innerHTML = '';
-  let filled=0, firstFreeIdx=-1;
-
-  slots.forEach((s,i)=>{
-    if(s.name) filled++;
-    else if(firstFreeIdx===-1) firstFreeIdx=i;
-
-    const prevFilled = i===0 || !!slots[i-1].name;
+  slots.forEach((s, i) => {
+    const prevFilled = i === 0 || !!slots[i-1].name;
     const locked = !s.name && !prevFilled;
-
     const div = document.createElement('div');
-    div.className = 'slot'+(s.name?' filled':'')+(locked?' locked':'');
+    div.className = 'slot' + (s.name ? ' filled' : '') + (locked ? ' locked' : '');
     div.innerHTML = `
       <span class="slot-time">${formatTime(s.start)} – ${formatTime(s.end)}</span>
       <span class="slot-name">${s.name || (locked ? '⊘ geblokkeerd' : '+ beschikbaar')}</span>
-      ${s.name ? `<button class="btn-cancel" onclick="cancel(${i})">verwijder</button>` : ''}
+      ${s.name ? `<button class="btn-cancel" onclick="cancel('${blockKey}',${i})">verwijder</button>` : ''}
     `;
     container.appendChild(div);
   });
+}
 
+function render() {
+  renderBlock(slotsA, 'slotsA', 'A');
+  renderBlock(slotsB, 'slotsB', 'B');
+
+  const all = allSlots();
+  const filled = all.filter(s => s.name).length;
   document.getElementById('statFilled').textContent = filled;
-  document.getElementById('statOpen').textContent = slots.length-filled;
-  document.getElementById('statNext').textContent = firstFreeIdx>=0 ? formatTime(slots[firstFreeIdx].start) : '–';
+  document.getElementById('statOpen').textContent = all.length - filled;
+
+  // Volgende vrije = eerste vrije in A dat bereikbaar is, anders B
+  const idxA = firstFreeIn(slotsA);
+  const idxB = firstFreeIn(slotsB);
+  let next = '–';
+  if (idxA !== -1 && (idxA === 0 || slotsA[idxA-1].name)) next = formatTime(slotsA[idxA].start);
+  else if (idxB !== -1 && (idxB === 0 || slotsB[idxB-1].name)) next = formatTime(slotsB[idxB].start);
+  document.getElementById('statNext').textContent = next;
 }
 
 init();
