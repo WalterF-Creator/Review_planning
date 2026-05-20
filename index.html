@@ -438,11 +438,33 @@ function makeSlots(block) {
   }));
 }
 
+const STORAGE_KEY = 'review_inschrijving_v1';
+
+function saveState() {
+  const data = {
+    slotsA: slotsA.map(s => s.name),
+    slotsB: slotsB.map(s => s.name)
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data.slotsA) data.slotsA.forEach((name, i) => { if (slotsA[i]) slotsA[i].name = name; });
+    if (data.slotsB) data.slotsB.forEach((name, i) => { if (slotsB[i]) slotsB[i].name = name; });
+    return true;
+  } catch (e) { return false; }
+}
+
 function init() {
   students = [...DEFAULT_STUDENTS];
   document.getElementById('footerDate').textContent = new Date().toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
   slotsA = makeSlots(BLOCKS[0]);
   slotsB = makeSlots(BLOCKS[1]);
+  loadState();
   render();
   renderSelect();
 }
@@ -488,6 +510,7 @@ function register() {
   target.arr[target.idx].name = name;
   sel.value = '';
   hideWarning();
+  saveState();
   render();
   renderSelect();
 }
@@ -500,12 +523,14 @@ function cancel(block, i) {
     if (arr[j].name) { arr[j-1].name = arr[j].name; arr[j].name = null; }
     else break;
   }
+  saveState();
   render(); renderSelect();
 }
 
 function resetAll() {
   if (allSlots().some(s => s.name) && !confirm('Alle inschrijvingen wissen?')) return;
   [...slotsA, ...slotsB].forEach(s => s.name = null);
+  saveState();
   render(); renderSelect();
 }
 
