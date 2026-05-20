@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="nl">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0053)file:///C:/Users/walte/OneDrive/Bureaublad/index.html -->
+<html lang="nl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Review inschrijving</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="./index_files/css2" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -23,6 +23,9 @@
     --warn-bg: #fdf3e3;
     --warn-border: #e8c97a;
     --warn-text: #7a5a1a;
+    --info-bg: #e8f0fb;
+    --info-border: #a8c0e8;
+    --info-text: #1a3a7a;
     --mono: 'DM Mono', monospace;
     --sans: 'DM Sans', sans-serif;
   }
@@ -36,6 +39,52 @@
   }
 
   .page { max-width: 640px; margin: 0 auto; }
+
+  /* Setup banner */
+  .setup-banner {
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.83rem;
+    color: var(--info-text);
+    font-family: var(--mono);
+    line-height: 1.6;
+  }
+  .setup-banner strong { font-weight: 500; display: block; margin-bottom: 0.4rem; font-size: 0.87rem; }
+  .setup-banner ol { padding-left: 1.2rem; margin: 0.5rem 0; }
+  .setup-banner li { margin-bottom: 0.25rem; }
+  .setup-banner a { color: var(--info-text); }
+  .setup-banner code {
+    background: rgba(0,0,0,0.07);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+  }
+  .setup-banner .config-row {
+    display: flex; gap: 8px; margin-top: 0.8rem; flex-wrap: wrap;
+  }
+  .setup-banner input {
+    flex: 1; min-width: 160px;
+    font-family: var(--mono); font-size: 0.78rem;
+    padding: 6px 10px;
+    border: 1px solid var(--info-border);
+    border-radius: 5px;
+    background: #fff;
+    color: var(--text);
+    outline: none;
+  }
+  .setup-banner input:focus { border-color: #5a80c0; }
+  .setup-banner button {
+    font-family: var(--mono); font-size: 0.78rem;
+    padding: 6px 14px;
+    background: var(--info-text);
+    color: #fff;
+    border: none; border-radius: 5px; cursor: pointer;
+    white-space: nowrap;
+  }
+  .setup-banner button:hover { background: #122a5a; }
 
   header {
     margin-bottom: 2.5rem;
@@ -74,11 +123,7 @@
   .sync-badge.syncing { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
   .sync-badge.error   { background: var(--danger-light); border-color: #c9a8a8; color: var(--danger); }
 
-  .sync-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-  }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
   .synced  .sync-dot { background: var(--accent); }
   .syncing .sync-dot { background: var(--warn-text); animation: pulse 1s infinite; }
   .error   .sync-dot { background: var(--danger); }
@@ -273,60 +318,100 @@
 </head>
 <body>
 
-<div class="loading-overlay" id="loadingOverlay">
+<div class="loading-overlay" id="loadingOverlay" style="display: none;">
   <div class="spinner"></div>
   Gegevens laden…
 </div>
 
 <div class="page">
 
+  <!-- JSONBin setup banner — hidden once API key + bin ID are saved -->
+  <div class="setup-banner" id="setupBanner" style="display: none;">
+    <strong>⚙ Eenmalige instelling — JSONBin.io koppelen</strong>
+    Volg deze stappen om gedeelde opslag in te stellen (gratis, geen server nodig):
+    <ol>
+      <li>Maak een gratis account op <a href="https://jsonbin.io/" target="_blank">jsonbin.io</a></li>
+      <li>Ga naar <strong>API Keys</strong> en kopieer je <code>X-Master-Key</code></li>
+      <li>Klik op <strong>Create Bin</strong>, zet de inhoud op <code>{}</code>, sla op en kopieer het Bin-ID uit de URL (bijv. <code>6830fabc…</code>)</li>
+      <li>Vul beide hieronder in en klik Opslaan — daarna werkt het voor iedereen</li>
+    </ol>
+    <div class="config-row">
+      <input id="inputApiKey" type="password" placeholder="X-Master-Key  ($2a$10$…)" autocomplete="off">
+      <input id="inputBinId" type="text" placeholder="Bin ID  (6830f…)" autocomplete="off">
+      <button onclick="saveConfig()">Opslaan</button>
+    </div>
+  </div>
+
   <header>
     <h1>Review inschrijving</h1>
     <p>Schrijf je hieronder in op het eerstvolgende beschikbare tijdslot - 30 min per student · 10:00–13:00</p>
     <p>Je bent uiteraard ook welkom om de presentaties van andere studenten bij te wonen!</p>
-    <div class="sync-badge syncing" id="syncBadge">
+    <div class="sync-badge synced" id="syncBadge">
       <span class="sync-dot"></span>
-      <span id="syncText">Verbinden…</span>
+      <span id="syncText">Gesynchroniseerd ✓</span>
     </div>
   </header>
 
   <div class="stats-row">
-    <div class="stat"><div class="val" id="statFilled">–</div><div class="lbl">Ingeschreven</div></div>
-    <div class="stat"><div class="val" id="statOpen">–</div><div class="lbl">Vrij</div></div>
-    <div class="stat"><div class="val" id="statNext">–</div><div class="lbl">Volgende vrij</div></div>
+    <div class="stat"><div class="val" id="statFilled">0</div><div class="lbl">Ingeschreven</div></div>
+    <div class="stat"><div class="val" id="statOpen">10</div><div class="lbl">Vrij</div></div>
+    <div class="stat"><div class="val" id="statNext">10:00</div><div class="lbl">Volgende vrij</div></div>
   </div>
 
   <div class="register-box">
     <div class="row">
-      <select id="nameSelect" disabled>
-        <option value="">Laden…</option>
-      </select>
-      <button onclick="register()" id="registerBtn" disabled>Inschrijven →</button>
+      <select id="nameSelect"><option value="">— Kies je naam —</option><option value="Simon Berghmans">Simon Berghmans</option><option value="Anse De Bal">Anse De Bal</option><option value="Dalvin Heyninck">Dalvin Heyninck</option><option value="Margo Maes">Margo Maes</option><option value="Emrys Melissant">Emrys Melissant</option><option value="Freek Van Litsenborg">Freek Van Litsenborg</option><option value="Nie Verbeek">Nie Verbeek</option><option value="Arne Verhulst">Arne Verhulst</option></select>
+      <button onclick="register()" id="registerBtn">Inschrijven →</button>
     </div>
     <div class="warning" id="warning" role="alert"></div>
   </div>
 
   <div class="slots-label">Blok 1 — 10:00 tot 13:00</div>
-  <div id="slotsA" style="margin-bottom:1.5rem;"></div>
+  <div id="slotsA" style="margin-bottom:1.5rem;"><div class="slot">
+      <span class="slot-time">10:00 – 10:30</span>
+      <span class="slot-name">+ beschikbaar</span>
+      
+    </div><div class="slot locked">
+      <span class="slot-time">10:30 – 11:00</span>
+      <span class="slot-name">⊘ geblokkeerd</span>
+      
+    </div><div class="slot locked">
+      <span class="slot-time">11:00 – 11:30</span>
+      <span class="slot-name">⊘ geblokkeerd</span>
+      
+    </div><div class="slot locked">
+      <span class="slot-time">11:30 – 12:00</span>
+      <span class="slot-name">⊘ geblokkeerd</span>
+      
+    </div><div class="slot locked">
+      <span class="slot-time">12:00 – 12:30</span>
+      <span class="slot-name">⊘ geblokkeerd</span>
+      
+    </div><div class="slot locked">
+      <span class="slot-time">12:30 – 13:00</span>
+      <span class="slot-name">⊘ geblokkeerd</span>
+      
+    </div></div>
 
   <button class="reset-btn" onclick="resetAll()">↺ Alles wissen</button>
 
   <footer>
-    <span>30 min per student · aaneengesloten slots · gedeeld via cloud</span>
-    <span id="footerDate"></span>
+    <span>30 min per student · aaneengesloten slots · gedeeld via JSONBin</span>
+    <span id="footerDate">woensdag 20 mei 2026</span>
   </footer>
 
 </div>
 
 <script>
 // ── Config
-const BLOCKS   = [{ start:10*60, end:13*60 }, { start:13*60, end:15*60 }];
-const DURATION  = 30;
-const STORAGE_KEY   = 'review_inschrijving_v2';
-const POLL_INTERVAL = 8000; // ms between live-sync polls
+const BLOCKS        = [{ start:10*60, end:13*60 }, { start:13*60, end:15*60 }];
+const DURATION      = 30;
+const LS_CONFIG     = 'review_jsonbin_config';
+const POLL_INTERVAL = 8000;
 
 let slotsA = [], slotsB = [];
 let isSaving = false;
+let apiKey = '', binId = '';
 
 const DEFAULT_STUDENTS = [
   "Simon Berghmans",
@@ -353,26 +438,56 @@ function makeSlots(block) {
   }));
 }
 
-// ── Sync status badge
-function setSyncStatus(status, text) {
-  const badge = document.getElementById('syncBadge');
-  badge.className = 'sync-badge ' + status;
-  document.getElementById('syncText').textContent = text;
+// ── Config persistence (saved per browser in localStorage)
+function loadConfig() {
+  try {
+    const cfg = JSON.parse(localStorage.getItem(LS_CONFIG) || '{}');
+    apiKey = cfg.apiKey || '';
+    binId  = cfg.binId  || '';
+  } catch(e) {}
+  if (apiKey && binId) {
+    document.getElementById('setupBanner').style.display = 'none';
+  }
 }
 
-// ── Shared persistent storage (visible to all users/browsers)
+function saveConfig() {
+  const k = document.getElementById('inputApiKey').value.trim();
+  const b = document.getElementById('inputBinId').value.trim();
+  if (!k || !b) { alert('Vul beide velden in.'); return; }
+  apiKey = k; binId = b;
+  localStorage.setItem(LS_CONFIG, JSON.stringify({ apiKey, binId }));
+  document.getElementById('setupBanner').style.display = 'none';
+  // Re-run init now that we have credentials
+  slotsA = makeSlots(BLOCKS[0]);
+  slotsB = makeSlots(BLOCKS[1]);
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  init();
+}
+
+// ── JSONBin API
+function binUrl() { return `https://api.jsonbin.io/v3/b/${binId}`; }
+
 async function saveState() {
-  if (isSaving) return;
+  if (isSaving || !apiKey || !binId) return;
   isSaving = true;
   setSyncStatus('syncing', 'Opslaan…');
   try {
-    const payload = JSON.stringify({
+    const payload = {
       slotsA: slotsA.map(s => s.name),
       slotsB: slotsB.map(s => s.name),
       updatedAt: Date.now()
+    };
+    const res = await fetch(binUrl(), {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': apiKey,
+        'X-Bin-Versioning': 'false'
+      },
+      body: JSON.stringify(payload)
     });
-    const ok = await window.storage.set(STORAGE_KEY, payload, true); // shared=true
-    setSyncStatus(ok ? 'synced' : 'error', ok ? 'Gesynchroniseerd ✓' : 'Opslaan mislukt');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    setSyncStatus('synced', 'Gesynchroniseerd ✓');
   } catch(e) {
     console.error('Save error:', e);
     setSyncStatus('error', 'Opslaan mislukt');
@@ -382,26 +497,28 @@ async function saveState() {
 }
 
 async function loadState() {
-  try {
-    const result = await window.storage.get(STORAGE_KEY, true); // shared=true
-    if (!result) return false;
-    const data = JSON.parse(result.value);
-    if (data.slotsA) data.slotsA.forEach((name, i) => { if (slotsA[i]) slotsA[i].name = name; });
-    if (data.slotsB) data.slotsB.forEach((name, i) => { if (slotsB[i]) slotsB[i].name = name; });
-    return true;
-  } catch(e) {
-    // Key not found yet — normal on first run
-    return false;
-  }
+  if (!apiKey || !binId) return false;
+  const res = await fetch(binUrl() + '/latest', {
+    headers: { 'X-Master-Key': apiKey }
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  const data = json.record || {};
+  if (data.slotsA) data.slotsA.forEach((name, i) => { if (slotsA[i]) slotsA[i].name = name; });
+  if (data.slotsB) data.slotsB.forEach((name, i) => { if (slotsB[i]) slotsB[i].name = name; });
+  return true;
 }
 
-// ── Background poll: pick up changes made from other browsers/devices
+// ── Background poll: pick up changes from other browsers
 async function pollForUpdates() {
-  if (isSaving) return;
+  if (isSaving || !apiKey || !binId) return;
   try {
-    const result = await window.storage.get(STORAGE_KEY, true);
-    if (!result) return;
-    const data = JSON.parse(result.value);
+    const res = await fetch(binUrl() + '/latest', {
+      headers: { 'X-Master-Key': apiKey }
+    });
+    if (!res.ok) return;
+    const json = await res.json();
+    const data = json.record || {};
     const freshA = makeSlots(BLOCKS[0]);
     const freshB = makeSlots(BLOCKS[1]);
     if (data.slotsA) data.slotsA.forEach((n, i) => { if (freshA[i]) freshA[i].name = n; });
@@ -417,21 +534,39 @@ async function pollForUpdates() {
   } catch(e) { /* silent */ }
 }
 
+// ── Sync badge
+function setSyncStatus(status, text) {
+  const badge = document.getElementById('syncBadge');
+  badge.className = 'sync-badge ' + status;
+  document.getElementById('syncText').textContent = text;
+}
+
 // ── Boot
 async function init() {
   document.getElementById('footerDate').textContent =
     new Date().toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 
-  slotsA = makeSlots(BLOCKS[0]);
-  slotsB = makeSlots(BLOCKS[1]);
+  if (!apiKey || !binId) {
+    document.getElementById('loadingOverlay').style.display = 'none';
+    setSyncStatus('error', 'Geen configuratie');
+    document.getElementById('nameSelect').innerHTML = '<option value="">— Kies je naam —</option>';
+    DEFAULT_STUDENTS.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      document.getElementById('nameSelect').appendChild(opt);
+    });
+    document.getElementById('nameSelect').disabled = false;
+    document.getElementById('registerBtn').disabled = true;
+    render(); renderSelect();
+    return;
+  }
 
   setSyncStatus('syncing', 'Verbinden…');
-
   try {
     await loadState();
     setSyncStatus('synced', 'Gesynchroniseerd ✓');
   } catch(e) {
-    setSyncStatus('error', 'Verbinding mislukt');
+    setSyncStatus('error', 'Verbinding mislukt — controleer je API key en Bin ID');
   }
 
   document.getElementById('loadingOverlay').style.display = 'none';
@@ -441,11 +576,10 @@ async function init() {
   render();
   renderSelect();
 
-  // Live sync with other devices
   setInterval(pollForUpdates, POLL_INTERVAL);
 }
 
-// ── UI helpers
+// ── UI
 function allSlots() { return [...slotsA, ...slotsB]; }
 
 function renderSelect() {
@@ -528,12 +662,10 @@ function renderBlock(slots, containerId, blockKey) {
 
 function render() {
   renderBlock(slotsA, 'slotsA', 'A');
-
   const all    = allSlots();
   const filled = all.filter(s => s.name).length;
   document.getElementById('statFilled').textContent = filled;
   document.getElementById('statOpen').textContent   = all.length - filled;
-
   const idxA = firstFreeIn(slotsA);
   const idxB = firstFreeIn(slotsB);
   let next = '–';
@@ -542,7 +674,12 @@ function render() {
   document.getElementById('statNext').textContent = next;
 }
 
+// ── Start
+loadConfig();
+slotsA = makeSlots(BLOCKS[0]);
+slotsB = makeSlots(BLOCKS[1]);
 init();
 </script>
-</body>
-</html>
+
+
+</body></html>
