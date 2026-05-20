@@ -35,10 +35,7 @@
     padding: 2rem 1rem;
   }
 
-  .page {
-    max-width: 640px;
-    margin: 0 auto;
-  }
+  .page { max-width: 640px; margin: 0 auto; }
 
   header {
     margin-bottom: 2.5rem;
@@ -58,46 +55,35 @@
     font-size: 0.85rem;
     color: var(--text-muted);
     font-weight: 300;
+    margin-top: 0.2rem;
   }
 
-  .config-bar {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    align-items: flex-end;
-  }
-
-  .config-bar .field {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .config-bar label {
-    font-size: 0.75rem;
+  .sync-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     font-family: var(--mono);
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-top: 0.6rem;
+    border: 1px solid;
+    transition: all 0.2s;
   }
+  .sync-badge.synced  { background: var(--accent-light); border-color: #a8c9b2; color: var(--accent-text); }
+  .sync-badge.syncing { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+  .sync-badge.error   { background: var(--danger-light); border-color: #c9a8a8; color: var(--danger); }
 
-  .config-bar input[type="time"],
-  .config-bar input[type="number"] {
-    font-family: var(--mono);
-    font-size: 0.9rem;
-    padding: 6px 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--surface);
-    color: var(--text);
-    width: 100px;
-    outline: none;
+  .sync-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
   }
+  .synced  .sync-dot { background: var(--accent); }
+  .syncing .sync-dot { background: var(--warn-text); animation: pulse 1s infinite; }
+  .error   .sync-dot { background: var(--danger); }
 
-  .config-bar input:focus {
-    border-color: var(--accent);
-  }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
 
   .stats-row {
     display: grid;
@@ -121,11 +107,7 @@
     line-height: 1;
   }
 
-  .stat .lbl {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 4px;
-  }
+  .stat .lbl { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
 
   .register-box {
     background: var(--surface);
@@ -135,10 +117,7 @@
     margin-bottom: 2rem;
   }
 
-  .register-box .row {
-    display: flex;
-    gap: 8px;
-  }
+  .register-box .row { display: flex; gap: 8px; }
 
   .register-box select {
     flex: 1;
@@ -173,7 +152,8 @@
     transition: background 0.15s;
   }
 
-  .register-box button:hover { background: var(--accent-text); }
+  .register-box button:hover    { background: var(--accent-text); }
+  .register-box button:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .warning {
     display: none;
@@ -208,15 +188,8 @@
     transition: background 0.15s, border-color 0.15s;
   }
 
-  .slot.filled {
-    background: var(--accent-light);
-    border-color: #a8c9b2;
-  }
-
-  .slot.locked {
-    opacity: 0.4;
-    pointer-events: none;
-  }
+  .slot.filled { background: var(--accent-light); border-color: #a8c9b2; }
+  .slot.locked { opacity: 0.4; pointer-events: none; }
 
   .slot-time {
     font-family: var(--mono);
@@ -227,16 +200,8 @@
 
   .slot.filled .slot-time { color: var(--accent-text); }
 
-  .slot-name {
-    flex: 1;
-    font-size: 0.88rem;
-    color: var(--text-muted);
-  }
-
-  .slot.filled .slot-name {
-    color: var(--accent-text);
-    font-weight: 500;
-  }
+  .slot-name { flex: 1; font-size: 0.88rem; color: var(--text-muted); }
+  .slot.filled .slot-name { color: var(--accent-text); font-weight: 500; }
 
   .btn-cancel {
     background: none;
@@ -267,80 +232,6 @@
 
   .reset-btn:hover { border-color: var(--border-strong); color: var(--text); }
 
-  /* ── EDIT-STUDENTS PANEL ── */
-  .edit-toggle {
-    margin-bottom: 1.5rem;
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    background: none;
-    border: 1px dashed var(--border);
-    border-radius: 6px;
-    padding: 6px 14px;
-    cursor: pointer;
-    transition: border-color 0.15s;
-  }
-  .edit-toggle:hover { border-color: var(--border-strong); color: var(--text); }
-
-  .edit-panel {
-    display: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.25rem;
-    margin-bottom: 2rem;
-  }
-
-  .edit-panel.open { display: block; }
-
-  .edit-panel label {
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    display: block;
-    margin-bottom: 6px;
-  }
-
-  .edit-panel textarea {
-    width: 100%;
-    height: 160px;
-    font-family: var(--mono);
-    font-size: 0.82rem;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--bg);
-    color: var(--text);
-    resize: vertical;
-    outline: none;
-    line-height: 1.6;
-  }
-
-  .edit-panel textarea:focus { border-color: var(--accent); }
-
-  .edit-panel .hint {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 6px;
-    margin-bottom: 10px;
-  }
-
-  .edit-panel .apply-btn {
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    padding: 7px 16px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .edit-panel .apply-btn:hover { background: var(--accent-text); }
-
   footer {
     margin-top: 2.5rem;
     padding-top: 1rem;
@@ -354,66 +245,89 @@
     flex-wrap: wrap;
     gap: 8px;
   }
+
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    z-index: 100;
+  }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-right: 10px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  Gegevens laden…
+</div>
+
 <div class="page">
 
   <header>
     <h1>Review inschrijving</h1>
     <p>Schrijf je hieronder in op het eerstvolgende beschikbare tijdslot - 30 min per student · 10:00–13:00</p>
     <p>Je bent uiteraard ook welkom om de presentaties van andere studenten bij te wonen!</p>
+    <div class="sync-badge syncing" id="syncBadge">
+      <span class="sync-dot"></span>
+      <span id="syncText">Verbinden…</span>
+    </div>
   </header>
 
-  <!-- STATS -->
   <div class="stats-row">
-    <div class="stat"><div class="val" id="statFilled">0</div><div class="lbl">Ingeschreven</div></div>
-    <div class="stat"><div class="val" id="statOpen">10</div><div class="lbl">Vrij</div></div>
+    <div class="stat"><div class="val" id="statFilled">–</div><div class="lbl">Ingeschreven</div></div>
+    <div class="stat"><div class="val" id="statOpen">–</div><div class="lbl">Vrij</div></div>
     <div class="stat"><div class="val" id="statNext">–</div><div class="lbl">Volgende vrij</div></div>
   </div>
 
-  <!-- REGISTER -->
   <div class="register-box">
     <div class="row">
-      <select id="nameSelect">
-        <option value="">— Kies je naam —</option>
+      <select id="nameSelect" disabled>
+        <option value="">Laden…</option>
       </select>
-      <button onclick="register()">Inschrijven →</button>
+      <button onclick="register()" id="registerBtn" disabled>Inschrijven →</button>
     </div>
     <div class="warning" id="warning" role="alert"></div>
   </div>
 
-  <!-- BLOK 1 -->
   <div class="slots-label">Blok 1 — 10:00 tot 13:00</div>
   <div id="slotsA" style="margin-bottom:1.5rem;"></div>
-
-  <!-- BLOK 2 -->
-  <!-- <div class="slots-label">Blok 2 — 13:00 tot 15:00</div> -->
-  <!-- <div id="slotsB"></div> -->
 
   <button class="reset-btn" onclick="resetAll()">↺ Alles wissen</button>
 
   <footer>
-    <span>30 min per student · aaneengesloten slots per blok</span>
+    <span>30 min per student · aaneengesloten slots · gedeeld via cloud</span>
     <span id="footerDate"></span>
   </footer>
 
 </div>
 
 <script>
-// ── Een blok: 10:00-13:00, 30 min per slot
-const BLOCKS = [
-  { start: 10*60, end: 13*60 },
-  { start: 13*60, end: 15*60 }
-];
-const DURATION = 30;
+// ── Config
+const BLOCKS   = [{ start:10*60, end:13*60 }, { start:13*60, end:15*60 }];
+const DURATION  = 30;
+const STORAGE_KEY   = 'review_inschrijving_v2';
+const POLL_INTERVAL = 8000; // ms between live-sync polls
 
-// Slotsstructuur: twee arrays, één per blok
-let slotsA = [];
-// let slotsB = [];
-let students = [];
+let slotsA = [], slotsB = [];
+let isSaving = false;
 
-// ── STUDENTENLIJST — vervang deze namen door jouw klaslijst
 const DEFAULT_STUDENTS = [
   "Simon Berghmans",
   "Anse De Bal",
@@ -425,7 +339,8 @@ const DEFAULT_STUDENTS = [
   "Arne Verhulst"
 ];
 
-function formatTime(mins) {
+// ── Helpers
+function fmt(mins) {
   return `${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`;
 }
 
@@ -434,41 +349,103 @@ function makeSlots(block) {
   return Array.from({length: n}, (_, i) => ({
     start: block.start + i * DURATION,
     end:   block.start + (i+1) * DURATION,
-    name: null
+    name:  null
   }));
 }
 
-const STORAGE_KEY = 'review_inschrijving_v1';
-
-function saveState() {
-  const data = {
-    slotsA: slotsA.map(s => s.name),
-    slotsB: slotsB.map(s => s.name)
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+// ── Sync status badge
+function setSyncStatus(status, text) {
+  const badge = document.getElementById('syncBadge');
+  badge.className = 'sync-badge ' + status;
+  document.getElementById('syncText').textContent = text;
 }
 
-function loadState() {
+// ── Shared persistent storage (visible to all users/browsers)
+async function saveState() {
+  if (isSaving) return;
+  isSaving = true;
+  setSyncStatus('syncing', 'Opslaan…');
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return false;
-    const data = JSON.parse(raw);
+    const payload = JSON.stringify({
+      slotsA: slotsA.map(s => s.name),
+      slotsB: slotsB.map(s => s.name),
+      updatedAt: Date.now()
+    });
+    const ok = await window.storage.set(STORAGE_KEY, payload, true); // shared=true
+    setSyncStatus(ok ? 'synced' : 'error', ok ? 'Gesynchroniseerd ✓' : 'Opslaan mislukt');
+  } catch(e) {
+    console.error('Save error:', e);
+    setSyncStatus('error', 'Opslaan mislukt');
+  } finally {
+    isSaving = false;
+  }
+}
+
+async function loadState() {
+  try {
+    const result = await window.storage.get(STORAGE_KEY, true); // shared=true
+    if (!result) return false;
+    const data = JSON.parse(result.value);
     if (data.slotsA) data.slotsA.forEach((name, i) => { if (slotsA[i]) slotsA[i].name = name; });
     if (data.slotsB) data.slotsB.forEach((name, i) => { if (slotsB[i]) slotsB[i].name = name; });
     return true;
-  } catch (e) { return false; }
+  } catch(e) {
+    // Key not found yet — normal on first run
+    return false;
+  }
 }
 
-function init() {
-  students = [...DEFAULT_STUDENTS];
-  document.getElementById('footerDate').textContent = new Date().toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+// ── Background poll: pick up changes made from other browsers/devices
+async function pollForUpdates() {
+  if (isSaving) return;
+  try {
+    const result = await window.storage.get(STORAGE_KEY, true);
+    if (!result) return;
+    const data = JSON.parse(result.value);
+    const freshA = makeSlots(BLOCKS[0]);
+    const freshB = makeSlots(BLOCKS[1]);
+    if (data.slotsA) data.slotsA.forEach((n, i) => { if (freshA[i]) freshA[i].name = n; });
+    if (data.slotsB) data.slotsB.forEach((n, i) => { if (freshB[i]) freshB[i].name = n; });
+    const changed =
+      JSON.stringify(slotsA.map(s=>s.name)) !== JSON.stringify(freshA.map(s=>s.name)) ||
+      JSON.stringify(slotsB.map(s=>s.name)) !== JSON.stringify(freshB.map(s=>s.name));
+    if (changed) {
+      slotsA = freshA; slotsB = freshB;
+      render(); renderSelect();
+      setSyncStatus('synced', 'Bijgewerkt ✓');
+    }
+  } catch(e) { /* silent */ }
+}
+
+// ── Boot
+async function init() {
+  document.getElementById('footerDate').textContent =
+    new Date().toLocaleDateString('nl-NL', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
   slotsA = makeSlots(BLOCKS[0]);
   slotsB = makeSlots(BLOCKS[1]);
-  loadState();
+
+  setSyncStatus('syncing', 'Verbinden…');
+
+  try {
+    await loadState();
+    setSyncStatus('synced', 'Gesynchroniseerd ✓');
+  } catch(e) {
+    setSyncStatus('error', 'Verbinding mislukt');
+  }
+
+  document.getElementById('loadingOverlay').style.display = 'none';
+  document.getElementById('nameSelect').disabled = false;
+  document.getElementById('registerBtn').disabled = false;
+
   render();
   renderSelect();
+
+  // Live sync with other devices
+  setInterval(pollForUpdates, POLL_INTERVAL);
 }
 
+// ── UI helpers
 function allSlots() { return [...slotsA, ...slotsB]; }
 
 function renderSelect() {
@@ -476,7 +453,7 @@ function renderSelect() {
   const cur = sel.value;
   sel.innerHTML = '<option value="">— Kies je naam —</option>';
   const taken = new Set(allSlots().map(s => s.name).filter(Boolean));
-  students.forEach(name => {
+  DEFAULT_STUDENTS.forEach(name => {
     if (!taken.has(name)) {
       const opt = document.createElement('option');
       opt.value = name; opt.textContent = name;
@@ -488,34 +465,26 @@ function renderSelect() {
 
 function firstFreeIn(slots) { return slots.findIndex(s => !s.name); }
 
-function register() {
-  const sel = document.getElementById('nameSelect');
+async function register() {
+  const sel  = document.getElementById('nameSelect');
   const name = sel.value.trim();
   if (!name) { showWarning('Kies eerst je naam uit de lijst.'); return; }
 
-  // Zoek eerste vrije slot: eerst blok A, dan blok B — maar alleen als vorige blok vol is of dit het eerste vrije is
   let target = null;
   const idxA = firstFreeIn(slotsA);
   const idxB = firstFreeIn(slotsB);
-
-  if (idxA !== -1) {
-    // Alleen inschrijven als voorgaand slot bezet is (aaneengesloten)
-    if (idxA === 0 || slotsA[idxA - 1].name) target = { arr: slotsA, idx: idxA };
-  }
-  if (!target && idxB !== -1) {
-    if (idxB === 0 || slotsB[idxB - 1].name) target = { arr: slotsB, idx: idxB };
-  }
+  if (idxA !== -1 && (idxA === 0 || slotsA[idxA-1].name)) target = { arr: slotsA, idx: idxA };
+  if (!target && idxB !== -1 && (idxB === 0 || slotsB[idxB-1].name)) target = { arr: slotsB, idx: idxB };
   if (!target) { showWarning('Alle slots zijn bezet.'); return; }
 
   target.arr[target.idx].name = name;
   sel.value = '';
   hideWarning();
-  saveState();
-  render();
-  renderSelect();
+  render(); renderSelect();
+  await saveState();
 }
 
-function cancel(block, i) {
+async function cancel(block, i) {
   const arr = block === 'A' ? slotsA : slotsB;
   if (!confirm(`"${arr[i].name}" verwijderen uit de planning?`)) return;
   arr[i].name = null;
@@ -523,15 +492,15 @@ function cancel(block, i) {
     if (arr[j].name) { arr[j-1].name = arr[j].name; arr[j].name = null; }
     else break;
   }
-  saveState();
   render(); renderSelect();
+  await saveState();
 }
 
-function resetAll() {
+async function resetAll() {
   if (allSlots().some(s => s.name) && !confirm('Alle inschrijvingen wissen?')) return;
   [...slotsA, ...slotsB].forEach(s => s.name = null);
-  saveState();
   render(); renderSelect();
+  await saveState();
 }
 
 function showWarning(msg) {
@@ -549,7 +518,7 @@ function renderBlock(slots, containerId, blockKey) {
     const div = document.createElement('div');
     div.className = 'slot' + (s.name ? ' filled' : '') + (locked ? ' locked' : '');
     div.innerHTML = `
-      <span class="slot-time">${formatTime(s.start)} – ${formatTime(s.end)}</span>
+      <span class="slot-time">${fmt(s.start)} – ${fmt(s.end)}</span>
       <span class="slot-name">${s.name || (locked ? '⊘ geblokkeerd' : '+ beschikbaar')}</span>
       ${s.name ? `<button class="btn-cancel" onclick="cancel('${blockKey}',${i})">verwijder</button>` : ''}
     `;
@@ -559,19 +528,17 @@ function renderBlock(slots, containerId, blockKey) {
 
 function render() {
   renderBlock(slotsA, 'slotsA', 'A');
-  // renderBlock(slotsB, 'slotsB', 'B');
 
-  const all = allSlots();
+  const all    = allSlots();
   const filled = all.filter(s => s.name).length;
   document.getElementById('statFilled').textContent = filled;
-  document.getElementById('statOpen').textContent = all.length - filled;
+  document.getElementById('statOpen').textContent   = all.length - filled;
 
-  // Volgende vrije = eerste vrije in A dat bereikbaar is, anders B
   const idxA = firstFreeIn(slotsA);
   const idxB = firstFreeIn(slotsB);
   let next = '–';
-  if (idxA !== -1 && (idxA === 0 || slotsA[idxA-1].name)) next = formatTime(slotsA[idxA].start);
-  else if (idxB !== -1 && (idxB === 0 || slotsB[idxB-1].name)) next = formatTime(slotsB[idxB].start);
+  if      (idxA !== -1 && (idxA === 0 || slotsA[idxA-1].name)) next = fmt(slotsA[idxA].start);
+  else if (idxB !== -1 && (idxB === 0 || slotsB[idxB-1].name)) next = fmt(slotsB[idxB].start);
   document.getElementById('statNext').textContent = next;
 }
 
